@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://foxvortaro/skin/skin.css" type="text/css"?> 
+<!DOCTYPE linktargetfinder SYSTEM "chrome://foxvortaro/locale/translations.dtd">
+<overlay id="sample" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+		<script type="application/x-javascript" src="chrome://foxvortaro/content/foxvortaro.js" />
+		<script type="application/x-javascript" src="chrome://foxvortaro/content/vortaro.js" />
+		
+		<menupopup id="menu_ToolsPopup"> 
+			<menuitem label="&foxvortaro;" key="foxvortaro-run-key" oncommand="foxvortaro.run()"/> 
+		</menupopup>
+		
+		<keyset>
+			<key id="foxvortaro-run-key" modifiers="alt" key="X" oncommand="foxvortaro.run()"/>
+			<key id="foxvortaro-run-key2" modifiers="alt" key="V" oncommand="foxvortaro.run()"/>
+			<key id="foxvortaro-run-key3" modifiers="alt" key="B" oncommand="foxvortaro.run()"/>
+		</keyset>
+		
+		<toolbarpalette id="BrowserToolbarPalette">
+			<toolbarbutton id="foxvortaro-toolbar-button" label="Elreta vortaro" tooltiptext="&foxvortaro;" oncommand="foxvortaro.run()"/>
+		</toolbarpalette>
+</overlay>
