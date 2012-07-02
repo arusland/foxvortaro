@@ -1,0 +1,8 @@
+content     foxvortaro    chrome/content/
+content     foxvortaro    chrome/content/ contentaccessible=yes
+overlay chrome://browser/content/browser.xul chrome://foxvortaro/content/browser.xul
+
+locale	foxvortaro	en-US	locale/en-US/
+
+skin	foxvortaro	classic/1.0	skin/
+style	chrome://global/content/customizeToolbar.xul	chrome://foxvortaro/skin/skin.css
