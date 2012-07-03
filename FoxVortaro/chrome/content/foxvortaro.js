@@ -66,15 +66,13 @@
 		
 		run_vorto : function (vorto) {
 			var teksto = vorto != '' ? vorto : foxvortaro.normaligu(foxvortaro.elektita_teksto());
-			
+
 			if (teksto.length != 0){
 				var tradukita = foxvortaro.traduku_vortoj(teksto);
 				
 				if (tradukita != null){
 					foxvortaro.montrupanelon(tradukita);
-					//alert(tradukita.v + ': ' + tradukita.t);
 				}else {
-					//alert("!Vorto '" + teksto + "' ne trovita!");
 					foxvortaro.montrueraron(teksto);
 				}
 			}
@@ -121,22 +119,26 @@
 				}
 			}
 			
-			var doc = content.document;
-			var tabelo = $('<table>', doc).attr('class', 'spec');
-			
-			for(var i = 0;i < vortoj2.length;i++){
-				var vorto = vortoj2[i];
-				var rez = foxvortaro.traduku(vorto);
-					
-				if (rez != null)
-					tabelo.append(foxvortaro.tabeligi(rez.v, rez.t));
-				else
-					tabelo.append(foxvortaro.tabeligi(vorto, null));
+			if (vortoj2.length > 0){
+				var doc = content.document;
+				var tabelo = $('<table>', doc).attr('class', 'spec');
+				
+				for(var i = 0;i < vortoj2.length;i++){
+					var vorto = vortoj2[i];
+					var rez = foxvortaro.traduku(vorto);
+						
+					if (rez != null)
+						tabelo.append(foxvortaro.tabeligi(rez.v, rez.t));
+					else
+						tabelo.append(foxvortaro.tabeligi(vorto, null));
+				}
+				
+				var html = $('<div>', doc).append(tabelo.clone()).remove().html();
+				
+				return html;
 			}
 			
-			var html = $('<div>', doc).append(tabelo.clone()).remove().html();
-			
-			return html;
+			return null;
 		},
 			
 		tabeligi : function(col1, col2){
