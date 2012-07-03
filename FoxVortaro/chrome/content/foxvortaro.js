@@ -80,19 +80,26 @@
 			}
 		},
 			
-		montrupanelon : function (teksto) {
+		montrupanelon : function (teksto, eraro) {
+			var doc = content.document;
 			var fenestro = window.openDialog("", "EORU_Vortaro", 'chrome,centerscreen,width=500,height=150,scrollbars=yes,resizable=yes');
-			fenestro.document.write('<html><head><title>Eo-Ru Vortaro</title><link rel="stylesheet" type="text/css" href="chrome://foxvortaro/skin/skin.css"/></head><body>' + teksto + '</body></html>');
+			var title = $('<title>', doc).append('Eo-Ru Vortaro');
+			var csslink = $('<link>', doc).attr('rel', 'stylesheet')
+										  .attr('type', 'text/css')
+										  .attr('href', 'chrome://foxvortaro/skin/skin.css');
+			var body1 = $('<body>', doc).append(teksto);
+			if (eraro) body1.attr('bgcolor', '#EA5744');
+			
+			var cnt =  $('<html>', doc).append($('<head>', doc).append(title).append(csslink)).append(body1);
+			var html = $('<div>', doc).append(cnt.clone()).remove().html();
+			
+			fenestro.document.write(html);
 			fenestro.document.close();
 			fenestro.focus();
 		},
 			
 		montrueraron : function (vorto) {
-			var fenestro = window.openDialog("", "EORU_Vortaro", 'chrome,centerscreen,width=400,height=150,scrollbars=yes,resizable=yes');
-			fenestro.document.write("<html><head><title>Eo-Ru Vortaro</title></head><body bgcolor='#EA5744'>Vorto "+'<b>' + foxvortaro.htmligu(vorto) + '</b>' 
-			+ " ne trovita!</body></html>");
-			fenestro.document.close();
-			fenestro.focus();
+			foxvortaro.montrupanelon("Vorto " + foxvortaro.htmligu(vorto) + " ne trovita!", true);
 		},
 			
 		traduku_vortoj : function (teksto) {
@@ -114,23 +121,34 @@
 				}
 			}
 			
-			var rezulto = '';			
+			var doc = content.document;
+			var tabelo = $('<table>', doc).attr('class', 'spec');
+			
 			for(var i = 0;i < vortoj2.length;i++){
 				var vorto = vortoj2[i];
 				var rez = foxvortaro.traduku(vorto);
 					
-				if (rez != null){
-					rezulto += "<tr><td><b>" + foxvortaro.htmligu(rez.v) + "</b></td><td>" + foxvortaro.htmligu(rez.t) + "</td></tr>";
-				}else{
-					rezulto += "<tr><td><b>" + foxvortaro.htmligu(vorto) + "</b></td><td><b><div style='color:red'>Vorto estas ne trovita!</div></b></td></tr>";
-				}
+				if (rez != null)
+					tabelo.append(foxvortaro.tabeligi(rez.v, rez.t));
+				else
+					tabelo.append(foxvortaro.tabeligi(vorto, null));
 			}
 			
-			if (rezulto == '') return null;
+			var html = $('<div>', doc).append(tabelo.clone()).remove().html();
 			
-			rezulto = "<table class='spec'>" + rezulto + "</table>";
-				
-			return rezulto;
+			return html;
+		},
+			
+		tabeligi : function(col1, col2){
+			var doc = content.document;
+			var ttr = $('<tr>', doc).append($('<td>', doc).append($('<b>', doc).append(foxvortaro.htmligu(col1))));
+			
+			if (col2 == null)
+				ttr.append($('<td>', doc).append($('<b>', doc).append($('<div>', doc).attr('style', 'color:red').append('Vorto estas ne trovita!'))));
+			else
+				ttr.append($('<td>', doc).append($('<b>', doc).append(foxvortaro.htmligu(col2))));
+			
+			return ttr;
 		},
 			
 		traduku : function (teksto) {

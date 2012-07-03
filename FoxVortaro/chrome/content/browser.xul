@@ -3,6 +3,7 @@
 <!DOCTYPE linktargetfinder SYSTEM "chrome://foxvortaro/locale/translations.dtd">
 <overlay id="sample" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+		<script type="application/x-javascript" src="chrome://foxvortaro/content/jquery-1.7.2.min.js" />
 		<script type="application/x-javascript" src="chrome://foxvortaro/content/foxvortaro.js" />
 		<script type="application/x-javascript" src="chrome://foxvortaro/content/vortaro.js" />
 		
