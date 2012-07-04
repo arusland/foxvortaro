@@ -1,14 +1,14 @@
 ﻿var foxvortaro = function () {
 	return {
 		init : function () {
-			foxvortaro.maksKvanto = 50;
+			this.maksKvanto = 50;
 			
-			foxvortaro.funcs = 
-				{ 1 : foxvortaro.foriguakuzativon,
-                  2 : foxvortaro.foriguplurajn,
-                  3 : foxvortaro.forigutempojn};
+			this.funcs = 
+				{ 1 : this.foriguakuzativon,
+                  2 : this.foriguplurajn,
+                  3 : this.forigutempojn};
                   
-            foxvortaro.prefiksoj =  {
+            this.prefiksoj =  {
             	1 : "mal",
             	2 : "ge",
             	3 : "ne",
@@ -22,7 +22,7 @@
             	11 : "fi",
             	12 : "mis"};
                   
-            foxvortaro.sufiksoj = { 
+            this.sufiksoj = { 
             	1 : "ig",
             	2 : "igx",
             	3 : "in",
@@ -58,38 +58,48 @@
             	34 : "op",
             	35 : "estr",
             	36 : "um"};
+            	
+            	jQuery.noConflict();
+			    $ = function(selector,context) { 
+			        return new jQuery.fn.init(selector,context||content.document); 
+			    };
+			    $.fn = $.prototype = jQuery.fn;
 			},
 						
 		run : function () {
-			foxvortaro.run_vorto('');
+			this.run_vorto('');
 		},
 		
 		run_vorto : function (vorto) {
-			var teksto = vorto != '' ? vorto : foxvortaro.normaligu(foxvortaro.elektita_teksto());
-
+			var teksto = vorto != '' ? vorto : this.normaligu(this.elektita_teksto());
+			
 			if (teksto.length != 0){
-				var tradukita = foxvortaro.traduku_vortoj(teksto);
+				var tradukita = this.traduku_vortoj(teksto);
 				
 				if (tradukita != null){
-					foxvortaro.montrupanelon(tradukita);
+					this.montrupanelon(tradukita);
 				}else {
-					foxvortaro.montrueraron(teksto);
+					this.montrueraron(teksto);
 				}
 			}
 		},
 			
+		toHtml : function (obj) {
+			var html = $('<div>').append(obj.clone()).remove().html();
+			return html;
+		},
+			
 		montrupanelon : function (teksto, eraro) {
-			var doc = content.document;
 			var fenestro = window.openDialog("", "EORU_Vortaro", 'chrome,centerscreen,width=500,height=150,scrollbars=yes,resizable=yes');
-			var title = $('<title>', doc).append('Eo-Ru Vortaro');
-			var csslink = $('<link>', doc).attr('rel', 'stylesheet')
+			var title = $('<title>').append('Eo-Ru Vortaro');
+			var csslink = $('<link>').attr('rel', 'stylesheet')
 										  .attr('type', 'text/css')
 										  .attr('href', 'chrome://foxvortaro/skin/skin.css');
-			var body1 = $('<body>', doc).append(teksto);
+			var body1 = $('<body>').append(teksto);
 			if (eraro) body1.attr('bgcolor', '#EA5744');
 			
-			var cnt =  $('<html>', doc).append($('<head>', doc).append(title).append(csslink)).append(body1);
-			var html = $('<div>', doc).append(cnt.clone()).remove().html();
+			var cnt =  $('<html>').append($('<head>').append(title).append(csslink)).append(body1);
+			var html = this.toHtml(cnt);
 			
 			fenestro.document.write(html);
 			fenestro.document.close();
@@ -97,58 +107,56 @@
 		},
 			
 		montrueraron : function (vorto) {
-			foxvortaro.montrupanelon("Vorto " + foxvortaro.htmligu(vorto) + " ne trovita!", true);
+			this.montrupanelon("Vorto " + this.htmligu(vorto) + " ne trovita!", true);
 		},
 			
-		traduku_vortoj : function (teksto) {
-			teksto = teksto.replace(/[^\w\d]+/g, " ").replace(/\s\s+/gi, " ");
+		traduku_vortoj : function (teksto1) {
+			var teksto = teksto1.replace(/[^\w\d]+/g, " ").replace(/\s\s+/gi, " ");
 			var vortoj = teksto.split(" ");
 			
 			vortoj2 = new Array();
 			
 			// forigu duplikatoj
 			for(var i = 0;i < vortoj.length;i++){
-				var vrt = foxvortaro.trim(vortoj[i]).toLowerCase();
+				var vrt = this.trim(vortoj[i]).toLowerCase();
 				
 				if (vrt != '' && vortoj2.indexOf(vrt) < 0){
 					vortoj2.push(vrt);
 				}
 				
-				if (vortoj2.length >= foxvortaro.maksKvanto){
+				if (vortoj2.length >= this.maksKvanto){
 					break;
 				}
 			}
 			
+			var tabelo = $('<table>').attr('class', 'spec');
+			
 			if (vortoj2.length > 0){
-				var doc = content.document;
-				var tabelo = $('<table>', doc).attr('class', 'spec');
-				
 				for(var i = 0;i < vortoj2.length;i++){
 					var vorto = vortoj2[i];
-					var rez = foxvortaro.traduku(vorto);
+					var rez = this.traduku(vorto);
 						
 					if (rez != null)
-						tabelo.append(foxvortaro.tabeligi(rez.v, rez.t));
+						tabelo.append(this.tabeligi(rez.v, rez.t));
 					else
-						tabelo.append(foxvortaro.tabeligi(vorto, null));
+						tabelo.append(this.tabeligi(vorto, null));
 				}
-				
-				var html = $('<div>', doc).append(tabelo.clone()).remove().html();
-				
-				return html;
+			}else{
+				tabelo.append(this.tabeligi(teksto1, null));
 			}
 			
-			return null;
+			var html = this.toHtml(tabelo);
+				
+			return html;
 		},
 			
 		tabeligi : function(col1, col2){
-			var doc = content.document;
-			var ttr = $('<tr>', doc).append($('<td>', doc).append($('<b>', doc).append(foxvortaro.htmligu(col1))));
+			var ttr = $('<tr>').append($('<td>').append($('<b>').append(this.htmligu(col1))));
 			
 			if (col2 == null)
-				ttr.append($('<td>', doc).append($('<b>', doc).append($('<div>', doc).attr('style', 'color:red').append('Vorto estas ne trovita!'))));
+				ttr.append($('<td>').append($('<b>').append($('<div>').attr('style', 'color:red').append('Vorto estas ne trovita!'))));
 			else
-				ttr.append($('<td>', doc).append($('<b>', doc).append(foxvortaro.htmligu(col2))));
+				ttr.append($('<td>').append($('<b>').append(this.htmligu(col2))));
 			
 			return ttr;
 		},
@@ -157,31 +165,31 @@
 			
 			if (teksto == null || teksto.length <= 0) return null;
 			
-			var result = foxvortaro.trovu(teksto);
+			var result = this.trovu(teksto);
 			if (result != null) return result;
 			
-			result = foxvortaro.trovuradikon(teksto);
+			result = this.trovuradikon(teksto);
 			if (result != null) return result;
 			
-			for(var func in foxvortaro.funcs){
-				var teksto2 = foxvortaro.funcs[func](teksto);
+			for(var func in this.funcs){
+				var teksto2 = this.funcs[func](teksto);
 				
 				if (teksto != teksto2){
-					result = foxvortaro.trovu(teksto2);
+					result = this.trovu(teksto2);
 					if (result != null) return result;
 					teksto = teksto2;
-					result = foxvortaro.trovuradikon(teksto);
+					result = this.trovuradikon(teksto);
 					if (result != null) return result;
 				}
 			}
 			
-			if (foxvortaro.havifinajxon(teksto)){
+			if (this.havifinajxon(teksto)){
 				teksto3 = teksto.substr(0, teksto.length - 1);
-				result = foxvortaro.trovuradikon(teksto3);
+				result = this.trovuradikon(teksto3);
 				if (result != null) return result;
 			}
 			
-			result = foxvortaro.trovualianformon(teksto);
+			result = this.trovualianformon(teksto);
 			if (result != null) return result;
 			
 			return null;
@@ -189,15 +197,15 @@
 			
 		trovupersufiksoj : function (teksto) {
 			
-			result = foxvortaro.trovuradikon(teksto);
+			result = this.trovuradikon(teksto);
 			if (result != null) return result;
 			
 			// forigi cxiujn prefiksojn
 			do{
 				var trovita = false;
 				
-				for(var suf in foxvortaro.sufiksoj){
-					var sufiks = foxvortaro.sufiksoj[suf];
+				for(var suf in this.sufiksoj){
+					var sufiks = this.sufiksoj[suf];
 					var idx = teksto.lastIndexOf(sufiks);
 					
 					if (idx > 0 && idx == (teksto.length - sufiks.length)){
@@ -210,7 +218,7 @@
 				var finu = true;
 				
 				if (trovita){
-					result = foxvortaro.trovuradikon(teksto);
+					result = this.trovuradikon(teksto);
 					if (result != null) return result;
 					finu = false;
 				}
@@ -223,11 +231,11 @@
 			teksto = teksto.toLowerCase();
 			var rezultoj = new Array();
 			
-			if (foxvortaro.havifinajxon(teksto)){
+			if (this.havifinajxon(teksto)){
 				teksto = teksto.substr(0, teksto.length - 1);
 			}
 			
-			var result = foxvortaro.trovupersufiksoj(teksto);
+			var result = this.trovupersufiksoj(teksto);
 			if (result != null){
 				rezultoj.push(result);
 			}
@@ -235,8 +243,8 @@
 			do{
 				var trovita = false;
 				
-				for(var pref in foxvortaro.prefiksoj){
-					var prefiks = foxvortaro.prefiksoj[pref];
+				for(var pref in this.prefiksoj){
+					var prefiks = this.prefiksoj[pref];
 					var idx = teksto.indexOf(prefiks);
 					
 					if (idx == 0){
@@ -247,7 +255,7 @@
 				}
 				
 				if (trovita){
-					var result = foxvortaro.trovupersufiksoj(teksto);
+					var result = this.trovupersufiksoj(teksto);
 					if (result != null){
 						rezultoj.push(result);
 						break;
@@ -277,21 +285,21 @@
 			
 			teksto = teksto.toLowerCase();
 			
-			for(var vorto in foxvortaro.vortoj){
+			for(var vorto in this.vortoj){
 				
-				var linio = foxvortaro.vortoj[vorto];
+				var linio = this.vortoj[vorto];
 				
 				if (teksto == linio.v.toLowerCase()){
 					if (vortorezulto == '') vortorezulto = linio.v;
 					
 					if (result == ''){
-						result = foxvortaro.trim(linio.t);
+						result = this.trim(linio.t);
 						index = 1;	
 					} else if (index == 1){
-						result = "1. " + result + "\n2. " + foxvortaro.trim(linio.t);
+						result = "1. " + result + "\n2. " + this.trim(linio.t);
 						index = 2;
 					} else {
-						result += "\n" + ++index + ". " + foxvortaro.trim(linio.t);
+						result += "\n" + ++index + ". " + this.trim(linio.t);
 					}									
 				}
 			}
@@ -307,11 +315,11 @@
 			
 			radiko = radiko.toLowerCase();
 			
-			for(var vorto in foxvortaro.vortoj){
-				var linio = foxvortaro.vortoj[vorto];
+			for(var vorto in this.vortoj){
+				var linio = this.vortoj[vorto];
 				
 				if (radiko.length < linio.v.length && radiko == linio.v.substr(0, linio.v.length - 1).toLowerCase()){
-					return foxvortaro.trovu(linio.v);
+					return this.trovu(linio.v);
 				}
 			}
 			
@@ -329,7 +337,7 @@
 						
 		normaligu: function (str)
 		{
-			return foxvortaro.trim(str.replace(/ĉ/gi, "cx").replace(/ĝ/gi, "gx").replace(/ŝ/gi, "sx")
+			return this.trim(str.replace(/ĉ/gi, "cx").replace(/ĝ/gi, "gx").replace(/ŝ/gi, "sx")
 			.replace(/ĥ/gi, "hx").replace(/ĵ/gi, "jx").replace(/ŭ/gi, "ux"));
 		},
 			
