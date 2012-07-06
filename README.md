@@ -1,8 +1,8 @@
-FoxVortaro - firefox extension
+п»їFoxVortaro - firefox extension
 ==========
 
 [eo] Esperanta-rusa vortaro por Firefox
-[ru] Эсперанто-русский словарь для Firefox
+[ru] Р­СЃРїРµСЂР°РЅС‚Рѕ-СЂСѓСЃСЃРєРёР№ СЃР»РѕРІР°СЂСЊ РґР»СЏ Firefox
 [en] Esperanto-russian dictionary for Firefox
 
 Screenshot:
