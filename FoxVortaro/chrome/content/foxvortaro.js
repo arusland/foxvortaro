@@ -84,7 +84,7 @@
 			}
 		},
 			
-		toHtml : function (obj) {
+		htmligi : function (obj) {
 			var html = $('<div>').append(obj.clone()).remove().html();
 			return html;
 		},
@@ -99,7 +99,7 @@
 			if (eraro) body1.attr('bgcolor', '#EA5744');
 			
 			var cnt =  $('<html>').append($('<head>').append(title).append(csslink)).append(body1);
-			var html = this.toHtml(cnt);
+			var html = this.htmligi(cnt);
 			
 			fenestro.document.write(html);
 			fenestro.document.close();
@@ -145,7 +145,7 @@
 				tabelo.append(this.tabeligi(teksto1, null));
 			}
 			
-			var html = this.toHtml(tabelo);
+			var html = this.htmligi(tabelo);
 				
 			return html;
 		},
