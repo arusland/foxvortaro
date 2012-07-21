@@ -1,90 +1,80 @@
-﻿var foxvortaro = function () {
-	return {
-		init : function () {
-			this.maksKvanto = 50;
-			
-			this.funcs = 
-				{ 1 : this.foriguakuzativon,
-                  2 : this.foriguplurajn,
-                  3 : this.forigutempojn};
-                  
-            this.prefiksoj =  {
-            	1 : "mal",
-            	2 : "ge",
-            	3 : "ne",
-            	4 : "en",
-            	5 : "ek",
-            	6 : "re",
-            	7 : "dis",
-            	8 : "bo",
-            	9 : "eks",
-            	10 : "pra",
-            	11 : "fi",
-            	12 : "mis"};
-                  
-            this.sufiksoj = { 
-            	1 : "ig",
-            	2 : "igx",
-            	3 : "in",
-            	4 : "it",
-            	5 : "at",
-            	6 : "ot",
-            	7 : "int",
-            	8 : "ant",
-            	9 : "ont",
-            	10 : "et",
-            	11 : "eg",
-            	12 : "em",
-            	13 : "ajx",
-            	14 : "ist",
-            	15 : "ul",
-            	16 : "ec",
-            	17 : "ar",
-            	18 : "an",
-            	19 : "ad",
-            	20 : "acx",
-            	21 : "ebl",
-            	22 : "ej",
-            	23 : "il",
-            	25 : "uj",
-            	26 : "er",
-            	27 : "ing",
-            	28 : "ind",
-            	29 : "end",
-            	30 : "id",
-            	31 : "ism",
-            	32 : "obl",
-            	33 : "on",
-            	34 : "op",
-            	35 : "estr",
-            	36 : "um"};
-            	
-            	jQuery.noConflict();
-			    $ = function(selector,context) { 
-			        return new jQuery.fn.init(selector,context||content.document); 
-			    };
-			    $.fn = $.prototype = jQuery.fn;
-			},
-						
+﻿/*
+ * Aŭtoro: Ruslan Absalyamov (ruslan.absalyamov@gmail.com)
+ * Licenco: http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+var foxvortaro = function () {
+	return {			
 		run : function () {
-			this.run_vorto('');
+			foxvortaro.run_vorto('');
 		},
 		
 		run_vorto : function (vorto) {
-			var teksto = vorto != '' ? vorto : this.normaligu(this.elektita_teksto());
+			var teksto = vorto != '' ? vorto : foxvortaro.normaligu(foxvortaro.elektita_teksto());
 			
 			if (teksto.length != 0){
-				var tradukita = this.traduku_vortoj(teksto);
+				var tradukita = foxvortaro.traduku_vortoj(teksto);
 				
 				if (tradukita != null){
-					this.montrupanelon(tradukita);
+					foxvortaro.montrupanelon(tradukita);
 				}else {
-					this.montrueraron(teksto);
+					foxvortaro.montrueraron(teksto);
 				}
 			}
 		},
 			
-		htmligi : function (obj) {
+		normaligu: function (str)
+		{
+			return foxvortaro.trim(str.replace(/ĉ/gi, "cx").replace(/ĝ/gi, "gx").replace(/ŝ/gi, "sx")
+			.replace(/ĥ/gi, "hx").replace(/ĵ/gi, "jx").replace(/ŭ/gi, "ux"));
+		},
+		
+		trim: function (str)
+		{
+			return str.replace(/(^[\s\.\,\-\'\–\:\!\—]+)|([\s\.\,\-\'\–\:\!\—]+$)/g, "");
+		},
+			
+		traduku_vortoj : function (teksto1) {
+			var teksto = teksto1.replace(/[^\w\d]+/g, " ").replace(/\s\s+/gi, " ");
+			var vortoj = teksto.split(" ");
+			
+			vortoj2 = new Array();
+			
+			// forigu duplikatoj
+			for(var i = 0;i < vortoj.length;i++){
+				var vrt = foxvortaro.trim(vortoj[i]).toLowerCase();
+				
+				if (vrt != '' && vortoj2.indexOf(vrt) < 0){
+					vortoj2.push(vrt);
+				}
+				
+				if (vortoj2.length >= foxvortaro.maksKvanto){
+					break;
+				}
+			}
+			
+			var tabelo = $('<table>').attr('class', 'spec');
+			
+			if (vortoj2.length > 0){
+				for(var i = 0;i < vortoj2.length;i++){
+					var vorto = vortoj2[i];
+					var rez = foxvortaro.traduku(vorto);
+						
+					if (rez != null)
+						tabelo.append(foxvortaro.tabeligi(rez.v, rez.t));
+					else
+						tabelo.append(foxvortaro.tabeligi(vorto, null));
+				}
+			}else{
+				tabelo.append(foxvortaro.tabeligi(teksto1, null));
+			}
+			
+			var html = foxvortaro.objekto_en_html(tabelo);
+				
+			return html;
+		},
+			
+		objekto_en_html : function (obj) {
 			var html = $('<div>').append(obj.clone()).remove().html();
 			return html;
 		},
@@ -99,7 +89,7 @@
 			if (eraro) body1.attr('bgcolor', '#EA5744');
 			
 			var cnt =  $('<html>').append($('<head>').append(title).append(csslink)).append(body1);
-			var html = this.htmligi(cnt);
+			var html = foxvortaro.objekto_en_html(cnt);
 			
 			fenestro.document.write(html);
 			fenestro.document.close();
@@ -107,56 +97,25 @@
 		},
 			
 		montrueraron : function (vorto) {
-			this.montrupanelon("Vorto " + this.htmligu(vorto) + " ne trovita!", true);
+			foxvortaro.montrupanelon("Vorto " + foxvortaro.htmligu(vorto) + " ne trovita!", true);
 		},
 			
-		traduku_vortoj : function (teksto1) {
-			var teksto = teksto1.replace(/[^\w\d]+/g, " ").replace(/\s\s+/gi, " ");
-			var vortoj = teksto.split(" ");
-			
-			vortoj2 = new Array();
-			
-			// forigu duplikatoj
-			for(var i = 0;i < vortoj.length;i++){
-				var vrt = this.trim(vortoj[i]).toLowerCase();
-				
-				if (vrt != '' && vortoj2.indexOf(vrt) < 0){
-					vortoj2.push(vrt);
-				}
-				
-				if (vortoj2.length >= this.maksKvanto){
-					break;
-				}
-			}
-			
-			var tabelo = $('<table>').attr('class', 'spec');
-			
-			if (vortoj2.length > 0){
-				for(var i = 0;i < vortoj2.length;i++){
-					var vorto = vortoj2[i];
-					var rez = this.traduku(vorto);
-						
-					if (rez != null)
-						tabelo.append(this.tabeligi(rez.v, rez.t));
-					else
-						tabelo.append(this.tabeligi(vorto, null));
-				}
-			}else{
-				tabelo.append(this.tabeligi(teksto1, null));
-			}
-			
-			var html = this.htmligi(tabelo);
-				
-			return html;
+	    htmligu : function(teksto){
+			var rezulto = teksto.replace(/(Cx|CX)/g, "Ĉ").replace(/cx/gi, "ĉ").replace(/(Gx|GX)/g, "Ĝ").replace(/gx/gi, "ĝ")
+				.replace(/(Hx|HX)/g, "Ĥ").replace(/hx/gi, "ĥ").replace(/(Jx|JX)/g, "Ĵ").replace(/jx/gi, "ĵ")
+				.replace(/(Ux|UX)/g, "Ŭ").replace(/ux/gi, "ŭ").replace(/(Sx|SX)/g, "Ŝ").replace(/sx/gi, "ŝ")
+				.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+				.replace(/_([^_]+)_/gi, "<span style='color: #6F716F'><i>$1</i></span>");
+			return rezulto;
 		},
 			
 		tabeligi : function(col1, col2){
-			var ttr = $('<tr>').append($('<td>').append($('<b>').append(this.htmligu(col1))));
+			var ttr = $('<tr>').append($('<td>').append($('<b>').append(foxvortaro.htmligu(col1))));
 			
 			if (col2 == null)
 				ttr.append($('<td>').append($('<b>').append($('<div>').attr('style', 'color:red').append('Vorto estas ne trovita!'))));
 			else
-				ttr.append($('<td>').append($('<b>').append(this.htmligu(col2))));
+				ttr.append($('<td>').append(foxvortaro.htmligu(col2)));
 			
 			return ttr;
 		},
@@ -165,47 +124,62 @@
 			
 			if (teksto == null || teksto.length <= 0) return null;
 			
-			var result = this.trovu(teksto);
+			var result = foxvortaro.trovu(teksto);
 			if (result != null) return result;
 			
-			result = this.trovuradikon(teksto);
+			result = foxvortaro.trovuradikon(teksto);
 			if (result != null) return result;
 			
-			for(var func in this.funcs){
-				var teksto2 = this.funcs[func](teksto);
-				
+			for(var func in foxvortaro.funcs){
+				var teksto2 = foxvortaro.funcs[func](teksto);
 				if (teksto != teksto2){
-					result = this.trovu(teksto2);
+					result = foxvortaro.trovu(teksto2);
 					if (result != null) return result;
 					teksto = teksto2;
-					result = this.trovuradikon(teksto);
+					result = foxvortaro.trovuradikon(teksto);
 					if (result != null) return result;
 				}
 			}
-			
-			if (this.havifinajxon(teksto)){
+
+			if (foxvortaro.havifinajxon(teksto)){
 				teksto3 = teksto.substr(0, teksto.length - 1);
-				result = this.trovuradikon(teksto3);
+				result = foxvortaro.trovuradikon(teksto3);
 				if (result != null) return result;
 			}
 			
-			result = this.trovualianformon(teksto);
+			result = foxvortaro.trovualianformon(teksto);
 			if (result != null) return result;
+			
+			return null;
+		},
+			
+		trovuradikon : function (radiko) {
+			var index = 0;
+			
+			radiko = radiko.toLowerCase();
+			
+			for(var vorto in foxvortaro.vortoj){
+				var linio = foxvortaro.vortoj[vorto];
+				
+				if (radiko.length < linio.v.length && radiko == linio.v.substr(0, linio.v.length - 1).toLowerCase()){
+					return foxvortaro.trovu(linio.v);
+				}
+			}
 			
 			return null;
 		},
 			
 		trovupersufiksoj : function (teksto) {
 			
-			result = this.trovuradikon(teksto);
+			result = foxvortaro.trovuradikon(teksto);
 			if (result != null) return result;
 			
 			// forigi cxiujn prefiksojn
 			do{
 				var trovita = false;
 				
-				for(var suf in this.sufiksoj){
-					var sufiks = this.sufiksoj[suf];
+				for(var suf in foxvortaro.sufiksoj){
+					var sufiks = foxvortaro.sufiksoj[suf];
 					var idx = teksto.lastIndexOf(sufiks);
 					
 					if (idx > 0 && idx == (teksto.length - sufiks.length)){
@@ -218,7 +192,7 @@
 				var finu = true;
 				
 				if (trovita){
-					result = this.trovuradikon(teksto);
+					result = foxvortaro.trovuradikon(teksto);
 					if (result != null) return result;
 					finu = false;
 				}
@@ -231,11 +205,11 @@
 			teksto = teksto.toLowerCase();
 			var rezultoj = new Array();
 			
-			if (this.havifinajxon(teksto)){
+			if (foxvortaro.havifinajxon(teksto)){
 				teksto = teksto.substr(0, teksto.length - 1);
 			}
 			
-			var result = this.trovupersufiksoj(teksto);
+			var result = foxvortaro.trovupersufiksoj(teksto);
 			if (result != null){
 				rezultoj.push(result);
 			}
@@ -243,8 +217,8 @@
 			do{
 				var trovita = false;
 				
-				for(var pref in this.prefiksoj){
-					var prefiks = this.prefiksoj[pref];
+				for(var pref in foxvortaro.prefiksoj){
+					var prefiks = foxvortaro.prefiksoj[pref];
 					var idx = teksto.indexOf(prefiks);
 					
 					if (idx == 0){
@@ -255,7 +229,7 @@
 				}
 				
 				if (trovita){
-					var result = this.trovupersufiksoj(teksto);
+					var result = foxvortaro.trovupersufiksoj(teksto);
 					if (result != null){
 						rezultoj.push(result);
 						break;
@@ -285,21 +259,21 @@
 			
 			teksto = teksto.toLowerCase();
 			
-			for(var vorto in this.vortoj){
+			for(var vorto in foxvortaro.vortoj){
 				
-				var linio = this.vortoj[vorto];
+				var linio = foxvortaro.vortoj[vorto];
 				
 				if (teksto == linio.v.toLowerCase()){
 					if (vortorezulto == '') vortorezulto = linio.v;
 					
 					if (result == ''){
-						result = this.trim(linio.t);
+						result = foxvortaro.trim(linio.t);
 						index = 1;	
 					} else if (index == 1){
-						result = "1. " + result + "\n2. " + this.trim(linio.t);
+						result = "1. " + result + "\n2. " + foxvortaro.trim(linio.t);
 						index = 2;
 					} else {
-						result += "\n" + ++index + ". " + this.trim(linio.t);
+						result += "\n" + ++index + ". " + foxvortaro.trim(linio.t);
 					}									
 				}
 			}
@@ -309,42 +283,10 @@
 			}else
 				return null;
 		},
-			
-		trovuradikon : function (radiko) {
-			var index = 0;
-			
-			radiko = radiko.toLowerCase();
-			
-			for(var vorto in this.vortoj){
-				var linio = this.vortoj[vorto];
-				
-				if (radiko.length < linio.v.length && radiko == linio.v.substr(0, linio.v.length - 1).toLowerCase()){
-					return this.trovu(linio.v);
-				}
-			}
-			
-			return null;
-		},
-			
-		htmligu : function(teksto){
-			var rezulto = teksto.replace(/(Cx|CX)/g, "Ĉ").replace(/cx/gi, "ĉ").replace(/(Gx|GX)/g, "Ĝ").replace(/gx/gi, "ĝ")
-				.replace(/(Hx|HX)/g, "Ĥ").replace(/hx/gi, "ĥ").replace(/(Jx|JX)/g, "Ĵ").replace(/jx/gi, "ĵ")
-				.replace(/(Ux|UX)/g, "Ŭ").replace(/ux/gi, "ŭ").replace(/(Sx|SX)/g, "Ŝ").replace(/sx/gi, "ŝ")
-				.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-				.replace(/_([^_]+)_/gi, "<span style='color: #6F716F'><i>$1</i></span>");
-			return rezulto;
-		},
-						
-		normaligu: function (str)
-		{
-			return this.trim(str.replace(/ĉ/gi, "cx").replace(/ĝ/gi, "gx").replace(/ŝ/gi, "sx")
-			.replace(/ĥ/gi, "hx").replace(/ĵ/gi, "jx").replace(/ŭ/gi, "ux"));
-		},
-			
+					
 		foriguakuzativon: function (str)
 		{
-			return str.replace(/(on)$/gi, "o").replace(/(an)$/gi, "a").replace(/(en)$/gi, "e")
-			.replace(/(jn)$/gi, "j");
+			return str.replace(/(on|ojn)$/gi, "o").replace(/(an|ajn)$/gi, "a").replace(/(en)$/gi, "e");
 		},
 			
 		foriguplurajn: function (str)
@@ -360,11 +302,6 @@
 		havifinajxon: function (str)
 		{
 			return str.match(/(e|o|i|a)$/gi) != null;
-		},
-	
-		trim: function (str)
-		{
-			return str.replace(/(^[\s\.\,\-\'\–\:\!\—]+)|([\s\.\,\-\'\–\:\!\—]+$)/g, "");
 		},
 
 		// elprenita el http://traduku.net/ 
@@ -436,7 +373,76 @@
 				alert("Ne povus elekti tekston.");
 				return "";
 			}
-	}
+		},
+	
+		init : function () {
+			foxvortaro.maksKvanto = 50;
+			
+			foxvortaro.funcs = 
+				{ 1 : foxvortaro.foriguakuzativon,
+                  2 : foxvortaro.foriguplurajn,
+                  3 : foxvortaro.forigutempojn};
+                  
+            foxvortaro.self = foxvortaro;
+                  
+            foxvortaro.prefiksoj =  {
+            	1 : "mal",
+            	2 : "ge",
+            	3 : "ne",
+            	4 : "en",
+            	5 : "ek",
+            	6 : "re",
+            	7 : "dis",
+            	8 : "bo",
+            	9 : "eks",
+            	10 : "pra",
+            	11 : "fi",
+            	12 : "mis"};
+                  
+            foxvortaro.sufiksoj = { 
+            	1 : "ig",
+            	2 : "igx",
+            	3 : "in",
+            	4 : "it",
+            	5 : "at",
+            	6 : "ot",
+            	7 : "int",
+            	8 : "ant",
+            	9 : "ont",
+            	10 : "et",
+            	11 : "eg",
+            	12 : "em",
+            	13 : "ajx",
+            	14 : "ist",
+            	15 : "ul",
+            	16 : "ec",
+            	17 : "ar",
+            	18 : "an",
+            	19 : "ad",
+            	20 : "acx",
+            	21 : "ebl",
+            	22 : "ej",
+            	23 : "il",
+            	25 : "uj",
+            	26 : "er",
+            	27 : "ing",
+            	28 : "ind",
+            	29 : "end",
+            	30 : "id",
+            	31 : "ism",
+            	32 : "obl",
+            	33 : "on",
+            	34 : "op",
+            	35 : "estr",
+            	36 : "um"};
+            	
+            	jQuery.noConflict();
+			    $ = function(selector,context) { 
+			        return new jQuery.fn.init(selector,context||content.document); 
+			    };
+			    $.fn = $.prototype = jQuery.fn;
+		}
 	};
 }();
+
 window.addEventListener("load", foxvortaro.init, false);

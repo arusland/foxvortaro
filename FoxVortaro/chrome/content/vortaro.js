@@ -1,7 +1,9 @@
 ﻿/*
- Vortoj elprenitis el la vortaro de E.Bokarev, kiu reviziita kaj kompletigita de Jurij Finkel kun partopreno de Igor Galiĉskij.
- http://code.google.com/p/erv/ (src-2010-11-26.rar)
-*/
+ * Aŭtoro: Ruslan Absalyamov (ruslan.absalyamov@gmail.com)
+ * Licenco: http://www.apache.org/licenses/LICENSE-2.0
+ * Vortoj elprenitis el la vortaro de E.Bokarev, kiu reviziita kaj kompletigita de Jurij Finkel kun partopreno de Igor Galiĉskij.
+ * http://code.google.com/p/erv/ (src-2010-11-26.rar)
+ */
 
 if ( typeof foxvortaro != 'undefined' ) {
 	foxvortaro.vortoj = {
